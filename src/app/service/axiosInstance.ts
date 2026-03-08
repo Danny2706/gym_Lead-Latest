@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:5000/api",
+  baseURL: "https://gym-lead-latest-2.onrender.com/api",
 });
 
 // Attach token automatically
