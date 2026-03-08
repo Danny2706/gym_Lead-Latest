@@ -22,7 +22,10 @@ router.post(
     body("firstName").trim().notEmpty().isLength({ max: 100 }),
     body("lastName").trim().notEmpty().isLength({ max: 100 }),
     body("email").trim().notEmpty().isEmail().normalizeEmail(),
-    body("phone").optional({ checkFalsy: true }).isMobilePhone(),
+    body("phone")
+      .optional({ checkFalsy: true })
+      .matches(/^[0-9\-\(\)\s]+$/)
+      .withMessage("Invalid phone number"),
     body("message").trim().notEmpty().isLength({ max: 1000 }),
   ],
   createContact,

@@ -18,31 +18,39 @@ export function StatsCard({
   icon: Icon,
   trend,
   delay = 0,
-}: StatsCardProps) {
+  dark = false,
+}: StatsCardProps & { dark?: boolean }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay }}
-      className="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow"
+      className={`rounded-xl shadow-md p-4 sm:p-6 hover:shadow-xl transition-all border ${
+        dark
+          ? "bg-gray-900 text-gray-100 border-gray-700"
+          : "bg-white border-gray-100 text-gray-900"
+      }`}
     >
       <div className="flex items-center justify-between mb-4">
-        <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
-          <Icon className="w-6 h-6 text-red-600" />
+        <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-red-900 to-red-700 rounded-xl flex items-center justify-center shadow-lg">
+          <Icon className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
         </div>
         {trend && (
-          <span
-            className={`text-sm font-medium ${
-              trend.isPositive ? "text-green-600" : "text-red-600"
+          <div
+            className={`px-3 py-1 rounded-full text-xs font-semibold ${
+              trend.isPositive
+                ? "bg-green-100 text-green-700"
+                : "bg-red-100 text-red-700"
             }`}
           >
-            {trend.isPositive ? "+" : ""}
-            {trend.value}%
-          </span>
+            {trend.isPositive ? "↑" : "↓"} {Math.abs(trend.value)}%
+          </div>
         )}
       </div>
-      <h3 className="text-3xl mb-1">{value}</h3>
-      <p className="text-gray-600 text-sm">{title}</p>
+      <h3 className="text-2xl sm:text-3xl font-bold mb-1">{value}</h3>
+      <p className={`text-sm ${dark ? "text-gray-400" : "text-gray-600"}`}>
+        {title}
+      </p>
     </motion.div>
   );
 }

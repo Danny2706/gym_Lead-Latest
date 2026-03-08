@@ -1,11 +1,15 @@
-import { Facebook, Instagram, Twitter, Mail, Phone, MapPin } from "lucide-react";
+import {
+  Facebook,
+  Instagram,
+  Twitter,
+  Mail,
+  Phone,
+  MapPin,
+} from "lucide-react";
 
 export function Footer() {
   return (
-    <footer
-      id="footer"
-      className="bg-gray-900 scroll-mt-20 text-white py-12"
-    >
+    <footer id="footer" className="bg-gray-900 dark:bg-black text-white py-12 border-t border-gray-800 dark:border-gray-900 transition-colors duration-300">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           <div>

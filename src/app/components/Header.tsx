@@ -1,64 +1,69 @@
 import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Sun, Moon } from "lucide-react";
 import { Button } from "./ui/button";
 import { motion, AnimatePresence } from "motion/react";
+import { useTheme } from "../components/context/ThemeContext"; 
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { isDarkMode, toggleDarkMode } = useTheme();
 
   const closeMenu = () => setMobileMenuOpen(false);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm shadow-sm">
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 backdrop-blur-sm shadow-sm transition-colors ${
+        isDarkMode ? "bg-gray-900/95" : "bg-white/95"
+      }`}
+    >
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <a href="#home" className="text-2xl text-gray-900">
+          <a
+            href="#home"
+            className={`text-2xl font-bold transition-colors ${
+              isDarkMode ? "text-white" : "text-gray-900"
+            }`}
+          >
             <span className="text-red-600">Fit</span>Life
           </a>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <a
-              href="#home"
-              className="text-gray-700 hover:text-red-600 transition-colors"
-            >
-              Home
-            </a>
-            <a
-              href="#features"
-              className="text-gray-700 hover:text-red-600 transition-colors"
-            >
-              Features
-            </a>
-            <a
-              href="#classes"
-              className="text-gray-700 hover:text-red-600 transition-colors"
-            >
-              Classes
-            </a>
-            <a
-              href="#pricing"
-              className="text-gray-700 hover:text-red-600 transition-colors"
-            >
-              Pricing
-            </a>
-            <a
-              href="#testimonials"
-              className="text-gray-700 hover:text-red-600 transition-colors"
-            >
-              Testimonials
-            </a>
-            <a
-              href="#contact"
-              className="text-gray-700 hover:text-red-600 transition-colors"
-            >
-              Contact
-            </a>
+            {[
+              "home",
+              "features",
+              "classes",
+              "pricing",
+              "testimonials",
+              "contact",
+            ].map((link) => (
+              <a
+                key={link}
+                href={`#${link}`}
+                className={`transition-colors ${
+                  isDarkMode
+                    ? "text-gray-300 hover:text-red-500"
+                    : "text-gray-700 hover:text-red-600"
+                }`}
+              >
+                {link.charAt(0).toUpperCase() + link.slice(1)}
+              </a>
+            ))}
           </nav>
 
-          {/* Desktop CTA */}
-          <div className="hidden md:block">
+          {/* Desktop CTA + Theme Toggle */}
+          <div className="hidden md:flex items-center space-x-4">
+            <button
+              onClick={toggleDarkMode}
+              className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+            >
+              {isDarkMode ? (
+                <Sun className="w-5 h-5 text-yellow-400" />
+              ) : (
+                <Moon className="w-5 h-5 text-gray-800" />
+              )}
+            </button>
             <a href="#contact">
               <Button className="bg-red-600 hover:bg-red-700 text-white">
                 Join Now
@@ -68,7 +73,11 @@ export function Header() {
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden text-gray-700"
+            className={`md:hidden p-2 rounded-full transition-colors ${
+              isDarkMode
+                ? "text-white hover:bg-gray-700"
+                : "text-gray-700 hover:bg-gray-200"
+            }`}
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             {mobileMenuOpen ? (
@@ -88,57 +97,52 @@ export function Header() {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3 }}
-            className="md:hidden bg-white border-t border-gray-200"
+            className={`md:hidden border-t transition-colors ${
+              isDarkMode
+                ? "bg-gray-900 border-gray-700"
+                : "bg-white border-gray-200"
+            }`}
           >
             <nav className="container mx-auto px-4 py-4 flex flex-col space-y-4">
-              <a
-                href="#home"
-                onClick={closeMenu}
-                className="text-gray-700 hover:text-red-600 transition-colors py-2"
-              >
-                Home
-              </a>
-              <a
-                href="#features"
-                onClick={closeMenu}
-                className="text-gray-700 hover:text-red-600 transition-colors py-2"
-              >
-                Features
-              </a>
-              <a
-                href="#classes"
-                onClick={closeMenu}
-                className="text-gray-700 hover:text-red-600 transition-colors py-2"
-              >
-                Classes
-              </a>
-              <a
-                href="#pricing"
-                onClick={closeMenu}
-                className="text-gray-700 hover:text-red-600 transition-colors py-2"
-              >
-                Pricing
-              </a>
-              <a
-                href="#testimonials"
-                onClick={closeMenu}
-                className="text-gray-700 hover:text-red-600 transition-colors py-2"
-              >
-                Testimonials
-              </a>
-              <a
-                href="#contact"
-                onClick={closeMenu}
-                className="text-gray-700 hover:text-red-600 transition-colors py-2"
-              >
-                Contact
-              </a>
+              {[
+                "home",
+                "features",
+                "classes",
+                "pricing",
+                "testimonials",
+                "contact",
+              ].map((link) => (
+                <a
+                  key={link}
+                  href={`#${link}`}
+                  onClick={closeMenu}
+                  className={`transition-colors py-2 ${
+                    isDarkMode
+                      ? "text-gray-300 hover:text-red-500"
+                      : "text-gray-700 hover:text-red-600"
+                  }`}
+                >
+                  {link.charAt(0).toUpperCase() + link.slice(1)}
+                </a>
+              ))}
 
-              <a href="#contact" onClick={closeMenu}>
-                <Button className="bg-red-600 hover:bg-red-700 text-white w-full">
-                  Join Now
-                </Button>
-              </a>
+              <div className="flex items-center justify-between space-x-4 mt-2">
+                <button
+                  onClick={toggleDarkMode}
+                  className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                >
+                  {isDarkMode ? (
+                    <Sun className="w-5 h-5 text-yellow-400" />
+                  ) : (
+                    <Moon className="w-5 h-5 text-gray-800" />
+                  )}
+                </button>
+                <a href="#contact" onClick={closeMenu} className="flex-1">
+                  <Button className="bg-red-600 hover:bg-red-700 text-white w-full">
+                    Join Now
+                  </Button>
+                </a>
+              </div>
             </nav>
           </motion.div>
         )}

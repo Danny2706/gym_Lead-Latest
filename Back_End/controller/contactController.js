@@ -16,25 +16,31 @@ const createContact = async (req, res) => {
     const { firstName, lastName, email, phone, message, recaptchaToken } =
       req.body;
 
-    if (!recaptchaToken) {
-      return res.status(400).json({ message: "reCAPTCHA token is missing" });
-    }
+    // 🔥 Skip reCAPTCHA in development mode
+    if (process.env.NODE_ENV === "production") {
+      if (!recaptchaToken) {
+        return res.status(400).json({ message: "reCAPTCHA token is missing" });
+      }
 
-    const secretKey = process.env.RECAPTCHA_SECRET;
+      const secretKey = process.env.RECAPTCHA_SECRET;
 
-    const response = await axios.post(
-      "https://www.google.com/recaptcha/api/siteverify",
-      null,
-      {
-        params: {
-          secret: secretKey,
-          response: recaptchaToken,
+      const response = await axios.post(
+        "https://www.google.com/recaptcha/api/siteverify",
+        null,
+
+        {
+          params: {
+            secret: secretKey,
+            response: recaptchaToken,
+          },
         },
-      },
-    );
+      );
 
-    if (!response.data.success) {
-      return res.status(400).json({ message: "Failed reCAPTCHA verification" });
+      if (!response.data.success) {
+        return res.status(400).json({
+          message: "Failed reCAPTCHA verification",
+        });
+      }
     }
 
     const newContact = await pool.query(
@@ -59,7 +65,7 @@ const createContact = async (req, res) => {
    GET CONTACTS (Dashboard)
    Supports:
    - status filter
-   - search (name/email)
+   - search
    - pagination
 ====================================================== */
 const getContacts = async (req, res) => {
@@ -81,32 +87,54 @@ const getContacts = async (req, res) => {
     if (search) {
       values.push(`%${search}%`);
       conditions.push(
-        `(first_name ILIKE $${values.length} OR last_name ILIKE $${values.length} OR email ILIKE $${values.length})`,
+        `(first_name ILIKE $${values.length} 
+          OR last_name ILIKE $${values.length} 
+          OR email ILIKE $${values.length})`
       );
     }
 
-    let query = "SELECT * FROM contacts";
+    let baseQuery = "FROM contacts";
 
     if (conditions.length > 0) {
-      query += " WHERE " + conditions.join(" AND ");
+      baseQuery += " WHERE " + conditions.join(" AND ");
     }
 
-    query += ` ORDER BY created_at DESC`;
-    query += ` LIMIT $${values.length + 1}`;
-    values.push(limit);
+    // Get total count
+    const countResult = await pool.query(
+      `SELECT COUNT(*) ${baseQuery}`,
+      values
+    );
 
-    query += ` OFFSET $${values.length + 1}`;
-    values.push(offset);
+    const total = parseInt(countResult.rows[0].count);
+    const totalPages = Math.ceil(total / limit);
 
-    const result = await pool.query(query, values);
+    // Get paginated data
+    const dataQuery = `
+      SELECT * ${baseQuery}
+      ORDER BY created_at DESC
+      LIMIT $${values.length + 1}
+      OFFSET $${values.length + 2}
+    `;
 
-    res.json(result.rows);
+    const result = await pool.query(dataQuery, [
+      ...values,
+      limit,
+      offset,
+    ]);
+
+    res.json({
+      data: result.rows,
+      pagination: {
+        total,
+        totalPages,
+        currentPage: page,
+      },
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
   }
 };
-
 /* ======================================================
    UPDATE CONTACT STATUS
 ====================================================== */

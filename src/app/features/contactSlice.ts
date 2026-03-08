@@ -6,13 +6,17 @@ import {
   sendContactForm,
 } from "../service/contactApi";
 
+/* ===============================
+   TYPES
+================================ */
+
 export interface Lead {
   id: string;
   first_name: string;
   last_name: string;
   email: string;
   phone: string;
-  message: string;
+  message: string; // ✅ interest removed
   status: "new" | "contacted" | "qualified" | "converted";
   created_at: string;
 }
@@ -21,23 +25,30 @@ interface ContactState {
   loading: boolean;
   leads: Lead[];
   total: number;
-  totalPages: number;
   page: number;
+  totalPages: number;
   success: string | null;
   error: string | null;
 }
+
+/* ===============================
+   INITIAL STATE
+================================ */
 
 const initialState: ContactState = {
   loading: false,
   leads: [],
   total: 0,
-  totalPages: 1,
   page: 1,
+  totalPages: 1,
   success: null,
   error: null,
 };
 
-// Submit Contact
+/* ===============================
+   PUBLIC FORM SUBMIT
+================================ */
+
 export const submitContact = createAsyncThunk(
   "contact/submit",
   async (data: any, { rejectWithValue }) => {
@@ -50,12 +61,14 @@ export const submitContact = createAsyncThunk(
   },
 );
 
-// Fetch Contacts
 export const getContacts = createAsyncThunk(
   "contact/getAll",
-  async (params?: { page?: number; search?: string }, { rejectWithValue }) => {
+  async (
+    { page = 1, limit = 10 }: { page?: number; limit?: number },
+    { rejectWithValue },
+  ) => {
     try {
-      const res = await fetchContacts(params);
+      const res = await fetchContacts({ page, limit });
       return res.data;
     } catch {
       return rejectWithValue("Failed to load contacts");
@@ -63,7 +76,6 @@ export const getContacts = createAsyncThunk(
   },
 );
 
-// Delete Contact
 export const removeContact = createAsyncThunk(
   "contact/delete",
   async (id: string) => {
@@ -72,14 +84,17 @@ export const removeContact = createAsyncThunk(
   },
 );
 
-// Update Status
 export const changeStatus = createAsyncThunk(
   "contact/updateStatus",
   async ({ id, status }: { id: string; status: string }) => {
     await updateContactStatus(id, status);
-    return { id, status }; // optimistic update
+    return { id, status };
   },
 );
+
+/* ===============================
+   SLICE
+================================ */
 
 const contactSlice = createSlice({
   name: "contact",
@@ -93,52 +108,58 @@ const contactSlice = createSlice({
   extraReducers: (builder) => {
     builder
 
-      // Submit
-      .addCase(submitContact.pending, (s) => {
-        s.loading = true;
+      // ================= SUBMIT =================
+      .addCase(submitContact.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.success = null;
       })
-      .addCase(submitContact.fulfilled, (s, a) => {
-        s.loading = false;
-        s.success = a.payload;
+      .addCase(submitContact.fulfilled, (state, action) => {
+        state.loading = false;
+        state.success = action.payload;
       })
-      .addCase(submitContact.rejected, (s, a) => {
-        s.loading = false;
-        s.error = a.payload as string;
-      })
-
-      // Get
-      .addCase(getContacts.pending, (s) => {
-        s.loading = true;
-      })
-      .addCase(getContacts.fulfilled, (s, a) => {
-        s.loading = false;
-
-        if (Array.isArray(a.payload)) {
-          s.leads = a.payload;
-          s.total = a.payload.length;
-          s.totalPages = 1;
-        } else {
-          s.leads = a.payload?.data ?? [];
-          s.total = a.payload?.total ?? s.leads.length;
-          s.page = a.payload?.page ?? 1;
-          s.totalPages = a.payload?.totalPages ?? 1;
-        }
-      })
-      .addCase(getContacts.rejected, (s, a) => {
-        s.loading = false;
-        s.error = a.payload as string;
+      .addCase(submitContact.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
       })
 
-      // Delete
-      .addCase(removeContact.fulfilled, (s, a) => {
-        s.leads = s.leads.filter((l) => l.id !== a.payload);
+      // ================= GET (PAGINATION) =================
+      .addCase(getContacts.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(getContacts.fulfilled, (state, action) => {
+        state.loading = false;
+
+        state.leads = action.payload?.data ?? [];
+
+        const pagination = action.payload?.pagination;
+
+        state.total = pagination?.total ?? 0;
+        state.page = pagination?.currentPage ?? 1;
+        state.totalPages = pagination?.totalPages ?? 1;
+      })
+      .addCase(getContacts.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
       })
 
-      // Optimistic Status Update
-      .addCase(changeStatus.fulfilled, (s, a) => {
-        const index = s.leads.findIndex((l) => l.id === a.payload.id);
+      // ================= DELETE =================
+      .addCase(removeContact.fulfilled, (state, action) => {
+        state.leads = state.leads.filter((lead) => lead.id !== action.payload);
+
+        // adjust total after delete
+        state.total = Math.max(state.total - 1, 0);
+        state.totalPages = Math.max(Math.ceil(state.total / 10), 1);
+      })
+
+      // ================= STATUS UPDATE =================
+      .addCase(changeStatus.fulfilled, (state, action) => {
+        const index = state.leads.findIndex(
+          (lead) => lead.id === action.payload.id,
+        );
+
         if (index !== -1) {
-          s.leads[index].status = a.payload.status as any;
+          state.leads[index].status = action.payload.status as any;
         }
       });
   },
