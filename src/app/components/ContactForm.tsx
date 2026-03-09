@@ -63,10 +63,14 @@ export function ContactForm() {
       setRecaptchaValue(null);
       dispatch(resetMessages());
 
-     setTimeout(() => {
-  window.scrollTo({ top: 0, behavior: "smooth" });
-  navigate("/thank-you");
-}, 1200);
+      setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        navigate("/thank-you");
+      }, 1200);
+    } catch (err) {
+      toast.error("Failed to submit form. Try again.");
+    }
+  };
 
   return (
     <section
@@ -117,10 +121,8 @@ export function ContactForm() {
                 </div>
                 <div>
                   <h4 className="text-white mb-1">Phone</h4>
-                  <p className="text-gray-300 dark:text-gray-400">
-                    (555) 123-4567
-                  </p>
-                  <p className="text-gray-400 text-sm dark:text-gray-500">
+                  <p className="text-gray-300">(555) 123-4567</p>
+                  <p className="text-gray-400 text-sm">
                     Mon-Fri 6am-10pm, Sat-Sun 7am-8pm
                   </p>
                 </div>
@@ -133,10 +135,8 @@ export function ContactForm() {
                 </div>
                 <div>
                   <h4 className="text-white mb-1">Email</h4>
-                  <p className="text-gray-300 dark:text-gray-400">
-                    info@fitlifegym.com
-                  </p>
-                  <p className="text-gray-400 text-sm dark:text-gray-500">
+                  <p className="text-gray-300">info@fitlifegym.com</p>
+                  <p className="text-gray-400 text-sm">
                     We'll respond within 24 hours
                   </p>
                 </div>
@@ -149,12 +149,8 @@ export function ContactForm() {
                 </div>
                 <div>
                   <h4 className="text-white mb-1">Location</h4>
-                  <p className="text-gray-300 dark:text-gray-400">
-                    123 Fitness Street
-                  </p>
-                  <p className="text-gray-300 dark:text-gray-400">
-                    Healthy City, HC 12345
-                  </p>
+                  <p className="text-gray-300">123 Fitness Street</p>
+                  <p className="text-gray-300">Healthy City, HC 12345</p>
                 </div>
               </div>
             </div>
@@ -169,7 +165,7 @@ export function ContactForm() {
           >
             <form
               onSubmit={handleSubmit}
-              className="space-y-6 bg-gray-800 dark:bg-gray-900 p-8 rounded-lg transition-colors duration-300"
+              className="space-y-6 bg-gray-800 dark:bg-gray-900 p-8 rounded-lg"
             >
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>
@@ -180,7 +176,7 @@ export function ContactForm() {
                     id="firstName"
                     value={form.firstName}
                     onChange={handleChange}
-                    className="bg-gray-700 dark:bg-gray-800 border-gray-600 dark:border-gray-700 text-white placeholder:text-gray-400 mt-2"
+                    className="bg-gray-700 border-gray-600 text-white mt-2"
                     required
                   />
                 </div>
@@ -193,7 +189,7 @@ export function ContactForm() {
                     id="lastName"
                     value={form.lastName}
                     onChange={handleChange}
-                    className="bg-gray-700 dark:bg-gray-800 border-gray-600 dark:border-gray-700 text-white placeholder:text-gray-400 mt-2"
+                    className="bg-gray-700 border-gray-600 text-white mt-2"
                     required
                   />
                 </div>
@@ -208,7 +204,7 @@ export function ContactForm() {
                   type="email"
                   value={form.email}
                   onChange={handleChange}
-                  className="bg-gray-700 dark:bg-gray-800 border-gray-600 dark:border-gray-700 text-white placeholder:text-gray-400 mt-2"
+                  className="bg-gray-700 border-gray-600 text-white mt-2"
                   required
                 />
               </div>
@@ -222,7 +218,7 @@ export function ContactForm() {
                   type="tel"
                   value={form.phone}
                   onChange={handleChange}
-                  className="bg-gray-700 dark:bg-gray-800 border-gray-600 dark:border-gray-700 text-white placeholder:text-gray-400 mt-2"
+                  className="bg-gray-700 border-gray-600 text-white mt-2"
                 />
               </div>
 
@@ -235,7 +231,7 @@ export function ContactForm() {
                   rows={5}
                   value={form.message}
                   onChange={handleChange}
-                  className="bg-gray-700 dark:bg-gray-800 border-gray-600 dark:border-gray-700 text-white placeholder:text-gray-400 mt-2 resize-none"
+                  className="bg-gray-700 border-gray-600 text-white mt-2 resize-none"
                   required
                 />
               </div>
