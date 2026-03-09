@@ -63,13 +63,10 @@ export function ContactForm() {
       setRecaptchaValue(null);
       dispatch(resetMessages());
 
-      setTimeout(() => {
-        navigate("/thank-you");
-      }, 1200);
-    } catch (err) {
-      toast.error("Failed to submit form. Try again.");
-    }
-  };
+     setTimeout(() => {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+  navigate("/thank-you");
+}, 1200);
 
   return (
     <section
