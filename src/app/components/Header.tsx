@@ -2,13 +2,22 @@ import { useState } from "react";
 import { Menu, X, Sun, Moon } from "lucide-react";
 import { Button } from "./ui/button";
 import { motion, AnimatePresence } from "motion/react";
-import { useTheme } from "../components/context/ThemeContext"; 
+import { useTheme } from "../components/context/ThemeContext";
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { isDarkMode, toggleDarkMode } = useTheme();
 
   const closeMenu = () => setMobileMenuOpen(false);
+
+  const navLinks = [
+    "home",
+    "features",
+    "classes",
+    "pricing",
+    "testimonials",
+    "contact",
+  ];
 
   return (
     <header
@@ -30,14 +39,7 @@ export function Header() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            {[
-              "home",
-              "features",
-              "classes",
-              "pricing",
-              "testimonials",
-              "contact",
-            ].map((link) => (
+            {navLinks.map((link) => (
               <a
                 key={link}
                 href={`#${link}`}
@@ -52,8 +54,9 @@ export function Header() {
             ))}
           </nav>
 
-          {/* Desktop CTA + Theme Toggle */}
+          {/* Desktop Right Section */}
           <div className="hidden md:flex items-center space-x-4">
+            {/* Dark Mode Toggle */}
             <button
               onClick={toggleDarkMode}
               className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
@@ -64,6 +67,7 @@ export function Header() {
                 <Moon className="w-5 h-5 text-gray-800" />
               )}
             </button>
+
             <a href="#contact">
               <Button className="bg-red-600 hover:bg-red-700 text-white">
                 Join Now
@@ -71,21 +75,40 @@ export function Header() {
             </a>
           </div>
 
-          {/* Mobile Menu Button */}
-          <button
-            className={`md:hidden p-2 rounded-full transition-colors ${
-              isDarkMode
-                ? "text-white hover:bg-gray-700"
-                : "text-gray-700 hover:bg-gray-200"
-            }`}
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          >
-            {mobileMenuOpen ? (
-              <X className="w-6 h-6" />
-            ) : (
-              <Menu className="w-6 h-6" />
-            )}
-          </button>
+          {/* Mobile Controls */}
+          <div className="md:hidden flex items-center gap-3">
+            {/* Dark Mode Toggle (Mobile) */}
+            <button
+              onClick={toggleDarkMode}
+              className={`p-2 rounded-full transition-colors ${
+                isDarkMode
+                  ? "bg-gray-800 text-yellow-400"
+                  : "bg-gray-200 text-gray-800"
+              }`}
+            >
+              {isDarkMode ? (
+                <Sun className="w-5 h-5" />
+              ) : (
+                <Moon className="w-5 h-5" />
+              )}
+            </button>
+
+            {/* Mobile Menu Button */}
+            <button
+              className={`p-2 rounded-full transition-colors ${
+                isDarkMode
+                  ? "text-white hover:bg-gray-700"
+                  : "text-gray-700 hover:bg-gray-200"
+              }`}
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
+              {mobileMenuOpen ? (
+                <X className="w-6 h-6" />
+              ) : (
+                <Menu className="w-6 h-6" />
+              )}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -97,21 +120,14 @@ export function Header() {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3 }}
-            className={`md:hidden border-t transition-colors ${
+            className={`md:hidden border-t ${
               isDarkMode
                 ? "bg-gray-900 border-gray-700"
                 : "bg-white border-gray-200"
             }`}
           >
             <nav className="container mx-auto px-4 py-4 flex flex-col space-y-4">
-              {[
-                "home",
-                "features",
-                "classes",
-                "pricing",
-                "testimonials",
-                "contact",
-              ].map((link) => (
+              {navLinks.map((link) => (
                 <a
                   key={link}
                   href={`#${link}`}
@@ -126,23 +142,11 @@ export function Header() {
                 </a>
               ))}
 
-              <div className="flex items-center justify-between space-x-4 mt-2">
-                <button
-                  onClick={toggleDarkMode}
-                  className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-                >
-                  {isDarkMode ? (
-                    <Sun className="w-5 h-5 text-yellow-400" />
-                  ) : (
-                    <Moon className="w-5 h-5 text-gray-800" />
-                  )}
-                </button>
-                <a href="#contact" onClick={closeMenu} className="flex-1">
-                  <Button className="bg-red-600 hover:bg-red-700 text-white w-full">
-                    Join Now
-                  </Button>
-                </a>
-              </div>
+              <a href="#contact" onClick={closeMenu}>
+                <Button className="bg-red-600 hover:bg-red-700 text-white w-full">
+                  Join Now
+                </Button>
+              </a>
             </nav>
           </motion.div>
         )}
